@@ -13,15 +13,16 @@ Team Members: Joel Von Behren, Jennie Huxford, Carlos, Kenneth Mendoza
 
 ***
 
-Data Source:
+Data Source: https://archive.ics.uci.edu/ml/datasets/Forest+Fires
 
 ***
 
-Overview:
+Overview: http://cwfis.cfs.nrcan.gc.ca/background/summary/fwi (Used to interpret index variables, ex: FFMC, DMC, DC,ISI)
+
 
 ***
 
-Background:
+Background: 
 
 ***
 
