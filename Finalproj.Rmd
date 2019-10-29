@@ -1,0 +1,28 @@
+---
+title: "Proposal"
+author: "Kenneth Mendoza"
+date: "October 29, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Team Members: Joel Von Behren, Jennie Huxford, Carlos, Kenneth Mendoza
+
+***
+
+Data Source:
+
+***
+
+Overview:
+
+***
+
+Background:
+
+***
+
+Explanatory Analysis:
