@@ -25,6 +25,10 @@ Variable "FFMC" is a numeric rating that measures the moisture content of litter
 ***
 
 Background: 
+This dataset comes from Paulo Cortez and Anibal Morais from the Department of Information Systems/R&D Algoritmi Centre at the University of Minho in Guimaraes, Portugal. The data is from the Montesinho natural park which is located in the Northeast region of Portugal and it the data collected is from January 2000 to December 2003. It was collected using meteorological stations and local sensors, along with the daily recording of specific features of any occuring forest fires. More information on this dataset is available at http://www3.dsi.uminho.pt/pcortez/fires.pdf.
+
+Citation:
+P. Cortez and A. Morais. A Data Mining Approach to Predict Forest Fires using Meteorological Data. In J. Neves, M. F. Santos and J. Machado Eds., New Trends in Artificial Intelligence, Proceedings of the 13th EPIA 2007 - Portuguese Conference on Artificial Intelligence, December, Guimaraes, Portugal, pp. 512-523, 2007. APPIA, ISBN-13 978-989-95618-0-9
 
 ***
 
