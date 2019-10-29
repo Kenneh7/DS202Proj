@@ -33,3 +33,5 @@ P. Cortez and A. Morais. A Data Mining Approach to Predict Forest Fires using Me
 ***
 
 Explanatory Analysis:
+With this data set we will be looking to see if weather has an impact on the area of burned forest.  We want to see if the area will increase or decrease depending on the weather.The variables needed to look at would be wind, rain, temp, RH, and temp
+Each variable will be compared to Area to see if there are any correlations between the data.  
