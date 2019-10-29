@@ -17,7 +17,9 @@ Data Source: https://archive.ics.uci.edu/ml/datasets/Forest+Fires
 
 ***
 
-Overview: http://cwfis.cfs.nrcan.gc.ca/background/summary/fwi (Used to interpret index variables, ex: FFMC, DMC, DC,ISI)
+Overview: 
+Data is taken from Montesinho Park in Portugal. There are 13 separate variables found in the dataset. X-Spatial coordinate, Y-Spatial coordinate, Month, Day, FFMC, DMC, DC, ISI, Temp, RH (relative humidity), Wind, Rain, Area.
+Variable "FFMC" is a numeric rating that measures the moisture content of litter and other fuels (Ranges from 0-101). Variable "DMC" is a numeric rating of average moisture content of loosely compacted organic layers of moderate depth. Variable "DC" is a numeric rating of the average moisture content of deep, compact organic layers. Variable "ISI" is a numeric rating of the expected rate of fire spread.
 
 
 ***
