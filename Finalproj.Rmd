@@ -1,6 +1,6 @@
 ---
 title: "Proposal"
-author: "Kenneth Mendoza"
+author: "Group 3"
 date: "October 29, 2019"
 output: html_document
 ---
@@ -9,22 +9,22 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Team Members: Joel Von Behren, Jennie Huxford, Carlos, Kenneth Mendoza
+**Team Members:** Joel Von Behren, Jennie Huxford, Carlos, Kenneth Mendoza
 
 ***
 
-Data Source: https://archive.ics.uci.edu/ml/datasets/Forest+Fires
+**Data Source:** https://archive.ics.uci.edu/ml/datasets/Forest+Fires
 
 ***
 
-Overview: 
+**Overview:** 
 Data is taken from Montesinho Park in Portugal. There are 13 separate variables found in the dataset. X-Spatial coordinate, Y-Spatial coordinate, Month, Day, FFMC, DMC, DC, ISI, Temp, RH (relative humidity), Wind, Rain, Area.
-Variable "FFMC" is a numeric rating that measures the moisture content of litter and other fuels (Ranges from 0-101). Variable "DMC" is a numeric rating of average moisture content of loosely compacted organic layers of moderate depth. Variable "DC" is a numeric rating of the average moisture content of deep, compact organic layers. Variable "ISI" is a numeric rating of the expected rate of fire spread.
+Variable "FFMC" is a numeric rating that measures the moisture content of litter and other fuels (Ranges from 0-101). Variable "DMC" is a numeric rating of average moisture content of loosely compacted organic layers of moderate depth. Variable "DC" is a numeric rating of the average moisture content of deep, compact organic layers. Variable "ISI" is a numeric rating of the expected rate of fire spread. Variables "Month", "Day", "Temp", "RH(Relative Humidity)", "Wind", "Rain", "Area" are self explanatory. Variables X-Spatial Coordinate and Y-Spactial coordinate are the coordinate system respective to Montesinho Park.
 
 
 ***
 
-Background: 
+**Background:** 
 This dataset comes from Paulo Cortez and Anibal Morais from the Department of Information Systems/R&D Algoritmi Centre at the University of Minho in Guimaraes, Portugal. The data is from the Montesinho natural park which is located in the Northeast region of Portugal and it the data collected is from January 2000 to December 2003. It was collected using meteorological stations and local sensors, along with the daily recording of specific features of any occuring forest fires. More information on this dataset is available at http://www3.dsi.uminho.pt/pcortez/fires.pdf.
 
 Citation:
@@ -32,6 +32,6 @@ P. Cortez and A. Morais. A Data Mining Approach to Predict Forest Fires using Me
 
 ***
 
-Explanatory Analysis:
+**Explanatory Analysis:**
 With this data set we will be looking to see if weather has an impact on the area of burned forest.  We want to see if the area will increase or decrease depending on the weather.The variables needed to look at would be wind, rain, temp, RH, and temp
 Each variable will be compared to Area to see if there are any correlations between the data.  
