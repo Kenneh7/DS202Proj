@@ -1,0 +1,38 @@
+---
+title: "DS202_project"
+author: "Carlos A. Gonzalez"
+date: "12/5/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+
+library(ggplot2)
+library(tidyverse)
+
+
+data = read.csv("forestfires.csv")
+
+data
+
+data$day = NULL
+
+data1 = filter(data, area<=600)
+
+data1
+
+is.na(data)
+ 
+ggplot(data=data1, aes(x=month, y=area)) + geom_bar(stat="identity")
+
+
+
+
+```
+
+
+
+
