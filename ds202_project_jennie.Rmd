@@ -1,0 +1,248 @@
+---
+title: "DS202_project"
+author: "Carlos A. Gonzalez"
+date: "12/5/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(psych)
+library(car)
+```
+
+#reading in the file
+```{r}
+forestfires = read.csv("forestfires.csv")
+head(data)
+```
+variables
+X
+Y
+month
+day
+FFMC:  Fine Fuel Moisture Code (range from 0 - 101)
+DMC:Duff Moisture Code
+DC: Drought Code
+ISI: Initial Spread Index (combination of wind and FFMC value)
+temp: Temperature in Celcius
+RH: relative humidity in %
+wind: wind speed in km/h
+rain: rain fall in mm/m2
+area: burn area in Hectares
+
+#Data Tidying
+##reordering the month and day variables
+```{r}
+forestfires$month <- factor(forestfires$month, levels = c("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"))
+forestfires$day <- factor(forestfires$day, levels = c("sun", "mon", "tue", "wed", "thu", "fri", "sat"))
+```
+
+not sure what is happening here
+```{r}
+forestfires$day = NULL
+forestfires1 = filter(forestfires, area<=600)
+is.na(forestfires)
+ggplot(data=forestfires1, aes(x=month, y=area)) + geom_bar(stat="identity")
+```
+##Distribution of forestfire area
+```{r}
+summary(forestfires$area)
+```
+
+```{r}
+ggplot(data = forestfires, aes(x=area)) +
+  geom_histogram(bins = 10) +
+  ggtitle("Distribution of Education Level") +
+  xlab("Education Level") +
+  ylab("Count")
+```
+##Creating a factor variable (arealevel), which divides the numeric variable area into a factor with 3 levels
+```{r}
+forestfires$arealevel[forestfires$area < 200.00] = "less than 200"
+forestfires$arealevel[forestfires$area >= 200.00 & forestfires$area < 400.00] = "less than 400"
+forestfires$arealevel[forestfires$area >= 400.00] = "greater than 400"
+unique(forestfires$arealevel)
+forestfires$arealevel <- factor(forestfires$arealevel, levels = c("less than 200", "less than 400", "greater than 400"))
+head(forestfires)
+```
+
+With this data set we will be looking to see if weather has an impact on the area of burned forest.  We want to see if the area will increase or decrease depending on the weather.The variables needed to look at would be wind, rain, RH, and temp
+#Research Question 1: Is there a positive or negative relationship between temperature, rain, wind speed or relative humidity and the amount of burned area?
+```{r}
+pairs(~ log(area) + FFMC + DMC + DC + ISI, data = forestfires, main = "Simple Scatterplot Matrix")
+pairs(~ log(area) + temp + RH + wind + rain, data = forestfires, main = "Simple Scatterplot Matrix")
+pairs(~ area + temp + RH + wind + log(rain), data = forestfires, main = "Simple Scatterplot Matrix")
+#correlation matrix
+cormatrix1 <- cor(forestfires [,c(12,5,6,7,8)], use = "na.or.complete")
+cormatrix2 <- cor(forestfires [,c(12,9,10,11)], use = "na.or.complete")
+cormatrix1
+cormatrix2
+```
+
+```{r}
+#codebook suggests a log transformation on area
+ggplot(data = forestfires, aes(x=wind, y = log(area))) +
+  geom_point(bins = 10) +
+  ggtitle("Wind vs Area") +
+  xlab("Wind Speed (km/h)") +
+  ylab("Area (hectares)")
+
+ggplot(data = forestfires, aes(x=rain, y = log(area))) +
+  geom_point(bins = 10) +
+  ggtitle("Rain vs Area") +
+  xlab("Rain (mm/m2)") +
+  ylab("Area (hectares)")
+
+ggplot(data = forestfires, aes(x=RH, y = log(area))) +
+  geom_point(bins = 10) +
+  ggtitle("RH vs Area") +
+  xlab("RH") +
+  ylab("Area (hectares)")
+
+ggplot(data = forestfires, aes(x=temp, y = log(area))) +
+  geom_point(bins = 10) +
+  ggtitle("Temperature vs Area") +
+  xlab("Temperature (Celcius)") +
+  ylab("Area (hectares)")
+```
+
+
+We also want to investigate how weather conditions such as rain, wind, and humidity can affect the ignition and spread of forest fires, especially at different times of year. Does certain weather favor many smaller fires or fewer larger fires? What time of year is most dangerous? These questions can help us get a foundation of understanding of forest fires in order to delve deeper into our dataset. We also want to find out how well man-made indices such as Initial Spread Index (ISI), Drought Code (DC), etc. portray past fires and predict future ones. 
+Each variable will be compared to Area to see if there are any correlations between the data.
+
+What time of year is most dangerous?
+```{r}
+ggplot(data = forestfires, aes(x = month, y = area)) +
+  geom_point() +
+  ggtitle("Distribution of Education Level") +
+  xlab("Education Level") +
+  ylab("Area")
+```
+
+```{r}
+ggplot(data = forestfires, aes(x = month, fill = arealevel)) +
+  geom_bar(position = "dodge") +
+  ggtitle("Count of Fires per Month by Area") +
+  xlab("Month") +
+  ylab("Count")
+```
+The DC and DMC distributions are higher when the count of fires in a month increase too.
+```{r}
+ggplot(data = forestfires, aes(x = month, y = ISI)) +
+  geom_boxplot() +
+  ggtitle("Initial Spread Index per month") +
+  xlab("Month") +
+  ylab("Initial Spread Index")
+
+ggplot(data = forestfires, aes(x = month, y = DC)) +
+  geom_boxplot() +
+  ggtitle("Drought Code per month") +
+  xlab("Month") +
+  ylab("Drought Code")
+
+ggplot(data = forestfires, aes(x = month, y = DMC)) +
+  geom_boxplot() +
+  ggtitle("Duff Moisture Code per month") +
+  xlab("Month") +
+  ylab("Duff Moisture Code")
+
+ggplot(data = forestfires, aes(x = month, y = FFMC)) +
+  geom_boxplot() +
+  ggtitle("Fine Fuel Moisture Code per month") +
+  xlab("Month") +
+  ylab("Fine Fuel Moisture Code")
+```
+
+
+```{r}
+ggplot(data = forestfires, aes(x = ISI, y = log(area))) +
+  geom_point() +
+  ggtitle("ISI of Area") +
+  xlab("Initial Spread Index") +
+  ylab("Area")
+
+ggplot(data = forestfires, aes(x = DC, y = log(area))) +
+  geom_point() +
+  ggtitle("DC of Area") +
+  xlab("Drought Code") +
+  ylab("Area")
+
+ggplot(data = forestfires, aes(x = DMC, y = log(area))) +
+  geom_point() +
+  ggtitle("DMC of Area") +
+  xlab("Duff Moisture Code") +
+  ylab("Area")
+
+ggplot(data = forestfires, aes(x = FFMC, y = log(area))) +
+  geom_point() +
+  ggtitle("FFMC of Area") +
+  xlab("Fine Fuel Moisture Code") +
+  ylab("Area")
+```
+
+
+#model selection 
+```{r}
+modelFULL <- lm(area ~ wind + rain + temp + RH, data = forestfires)
+summary(modelFULL)
+```
+```{r}
+modelFULL2 <- lm(area ~ FFMC + DMC + DC + ISI, data = forestfires)
+summary(modelFULL)
+```
+```{r}
+library(olsrr)
+comparison<-ols_step_all_possible(modelFULL)
+View(comparison)
+```
+Forward selection-Adds predictors based only on p-values. Requires olsrr package.
+
+```{r}
+ols_step_forward_p(modelFULL, penter = 0.05, details=TRUE)  ##penter is the alpha cutoff for the p-value to "enter"
+```
+
+Backward elimination-Removes predictors based only on p-values. Requires olsrr package.
+```{r}
+ols_step_backward_p(modelFULL, prem = 0.05, details=TRUE)  ##prem is the alpha cutoff for the p-value to "remove"
+```
+
+#Fit Final Model
+```{r}
+modelFinal<- lm(X1SCHOOLBEL ~ X1SCHOOLENG + X1MTHINT + X1RACE, data = edu)
+summary(modelFinal)
+```
+
+Compute VIF's.
+```{r}
+library(car)
+vif(modelFinal)
+```
+Overall fit of final model
+```{r}
+summary(modelFinal)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
