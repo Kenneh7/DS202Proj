@@ -35,6 +35,7 @@ wind: wind speed in km/h
 rain: rain fall in mm/m2
 area: burn area in Hectares
 
+
 #Data Tidying
 ##reordering the month and day variables
 ```{r}
@@ -70,6 +71,15 @@ unique(forestfires$arealevel)
 forestfires$arealevel <- factor(forestfires$arealevel, levels = c("less than 200", "less than 400", "greater than 400"))
 head(forestfires)
 ```
+
+```{r}
+september <- forestfires %>% filter(month=='sep')
+```
+
+```{r}
+table()
+```
+
 
 With this data set we will be looking to see if weather has an impact on the area of burned forest.  We want to see if the area will increase or decrease depending on the weather.The variables needed to look at would be wind, rain, RH, and temp
 #Research Question 1: Is there a positive or negative relationship between temperature, rain, wind speed or relative humidity and the amount of burned area?
@@ -119,8 +129,8 @@ What time of year is most dangerous?
 ```{r}
 ggplot(data = forestfires, aes(x = month, y = area)) +
   geom_point() +
-  ggtitle("Distribution of Education Level") +
-  xlab("Education Level") +
+  ggtitle("Area by Month") +
+  xlab("Month") +
   ylab("Area")
 ```
 
@@ -158,6 +168,31 @@ ggplot(data = forestfires, aes(x = month, y = FFMC)) +
   ylab("Fine Fuel Moisture Code")
 ```
 
+```{r}
+ggplot(data = forestfires, aes(x = month, y = rain)) +
+  geom_boxplot() +
+  ggtitle("rain per month") +
+  xlab("Month") +
+  ylab("Rain fall")
+
+ggplot(data = forestfires, aes(x = month, y = temp)) +
+  geom_boxplot() +
+  ggtitle("Temperature per month") +
+  xlab("Month") +
+  ylab("Temperature")
+
+ggplot(data = forestfires, aes(x = month, y = RH)) +
+  geom_boxplot() +
+  ggtitle("Relative Humidity per month") +
+  xlab("Month") +
+  ylab("Relative Humidity")
+
+ggplot(data = forestfires, aes(x = month, y = wind)) +
+  geom_boxplot() +
+  ggtitle("Wind speed per month") +
+  xlab("Month") +
+  ylab("Wind Speed")
+```
 
 ```{r}
 ggplot(data = forestfires, aes(x = ISI, y = log(area))) +
@@ -185,16 +220,45 @@ ggplot(data = forestfires, aes(x = FFMC, y = log(area))) +
   ylab("Area")
 ```
 
+```{r}
+septlow <- september %>% filter(arealevel != "greater than 400")
+```
 
+```{r}
+ggplot(data = septlow, aes(x = ISI, y = log(area))) +
+  geom_point() +
+  ggtitle("ISI of Area") +
+  xlab("Initial Spread Index") +
+  ylab("Area")
+
+ggplot(data = septlow, aes(x = DC, y = area)) +
+  geom_point() +
+  ggtitle("DC of Area") +
+  xlab("Drought Code") +
+  ylab("Area")
+
+ggplot(data = septlow, aes(x = DMC, y = area)) +
+  geom_point() +
+  ggtitle("DMC of Area") +
+  xlab("Duff Moisture Code") +
+  ylab("Area")
+
+ggplot(data = septlow, aes(x = FFMC, y = area)) +
+  geom_point() +
+  ggtitle("FFMC of Area") +
+  xlab("Fine Fuel Moisture Code") +
+  ylab("Area")
+```
 #model selection 
 ```{r}
-modelFULL <- lm(area ~ wind + rain + temp + RH, data = forestfires)
+modelFULL <- lm(area ~ rain + temp + RH, data = forestfires)
 summary(modelFULL)
 ```
 ```{r}
 modelFULL2 <- lm(area ~ FFMC + DMC + DC + ISI, data = forestfires)
 summary(modelFULL)
 ```
+
 ```{r}
 library(olsrr)
 comparison<-ols_step_all_possible(modelFULL)
@@ -228,9 +292,32 @@ summary(modelFinal)
 ```
 
 
+```{r}
+#codebook suggests a log transformation on area
+ggplot(data = september, aes(x=wind, y = log(area))) +
+  geom_point() +
+  ggtitle("Wind vs Area") +
+  xlab("Wind Speed (km/h)") +
+  ylab("Area (hectares)")
 
+ggplot(data = september, aes(x=rain, y = area)) +
+  geom_point() +
+  ggtitle("Rain vs Area") +
+  xlab("Rain (mm/m2)") +
+  ylab("Area (hectares)")
 
+ ggplot(data = september, aes(x=RH, y = log(area))) +
+  geom_point() +
+  ggtitle("RH vs Area") +
+  xlab("RH") +
+  ylab("Area (hectares)")
 
+ggplot(data = september, aes(x=temp, y = log(area))) +
+  geom_point() +
+  ggtitle("Temperature vs Area") +
+  xlab("Temperature (Celcius)") +
+  ylab("Area (hectares)")
+```
 
 
 
