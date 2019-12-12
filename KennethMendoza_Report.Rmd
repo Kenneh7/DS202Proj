@@ -1,0 +1,78 @@
+---
+title: "DS202_project"
+author: "Kenneth Mendoza"
+date: "12/12/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(psych)
+library(car)
+```
+
+#reading in the file
+```{r}
+forestfires = read.csv("forestfires.csv")
+head(data)
+```
+
+#Data Tidying
+##reordering the month and day variables
+```{r}
+forestfires$month <- factor(forestfires$month, levels = c("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"))
+forestfires$day <- factor(forestfires$day, levels = c("sun", "mon", "tue", "wed", "thu", "fri", "sat"))
+```
+
+
+```{r}
+library(dplyr)
+
+
+top = subset(forestfires, X == 3 & Y == 4)
+apl = top_n(top, 10, area)
+summary(apl$area)
+
+apl$areaburned[apl$area <5.00] = "Area Burned < 50000m^2"
+apl$areaburned[apl$area >= 5.00 & apl$area < 13.00] = "50000m^2 <= Area Burned <= 130000m^2"
+apl$areaburned[apl$area >= 13.00] = "Area Burned > 130000m^2"
+apl$areaburned <- factor(apl$areaburned, levels = c("Area Burned < 50000m^2", "50000m^2 <= Area Burned <= 130000m^2", "Area Burned > 130000m^2"))
+
+
+ggplot(data = apl, aes(area, fill = areaburned, color = areaburned)) +
+  geom_histogram(position="identity") + 
+  ggtitle("Largest 10 fires in section (3,4)") +
+  xlab("Area burned") +
+  ylab("Count")
+```
+
+```{r}
+top1 = subset(forestfires, X == 8 & Y == 6)
+apl1 = top_n(top1, 10, area)
+summary(apl1$area)
+
+apl1$areaburned[apl1$area < 14.00] = "Area Burned < 140000m^2"
+apl1$areaburned[apl1$area >= 14.00 & apl$area < 68.00] = "140000m^2 <= Area Burned <= 680000m^2"
+apl1$areaburned[apl1$area >= 68.00] = "Area Burned > 680000m^2"
+apl1$areaburned <- factor(apl1$areaburned, levels = c("Area Burned < 140000m^2", "140000m^2 <= Area Burned <= 680000m^2", "Area Burned > 680000m^2"))
+
+ggplot(data = apl1, aes(area, fill = areaburned, color = areaburned)) +
+  geom_histogram(position="identity") + 
+  ggtitle("Largest 10 fires in section (8,6)") +
+  xlab("Area burned") +
+  ylab("Count")
+```
+
+These two graphs display histograms of the 10 largest forest fires in sections (3,4) and (8,6) while data was being collected. When compared, the histograms show us that the mean area burned is significantly larger in section (8,6) than section (3,4). When observing the map of Montesinho National Park, we noticed that section (8,6) had little to no roads or paths. We infer that because of the lack of roads or paths, it becomes difficult for firefighters to detect forest fires and then travel to the site to put it out. Section (8,6) had the second most forest fires in the National Park while data was being collected. Section (3,4) contained the most forest fires in Montesinho, with 28 forest fires over the course of 4 years. The histograms show that fires did not get as extreme as its distant neighbor, section (8,6). Reffering back to the map, we observed that there were many paths and roads on this section of the park. We infer that this is a relatively populated area, making it easier for firefighters to detect and then intervene with these forest fires. For the cause of all these fires, we infer that the types of vegetation in this area are highly exposed to the sun. This would make it easier for fires to start up and spread quickly before firefighters can intervene.
+
+
+
+
+
+
+
+
