@@ -1,0 +1,195 @@
+---
+title: "DS 202 Final Report"
+author: "Jennie Huxford"
+date: "12/12/2019"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+**Background:** 
+This dataset comes from Paulo Cortez and Anibal Morais from the Department of Information Systems/R&D Algoritmi Centre at the University of Minho in Guimaraes, Portugal. The data is from the Montesinho natural park which is located in the Northeast region of Portugal. Data was collected from January 2000 to December 2003 using meteorological stations and local sensors, along with daily recording of specific features of any occuring forest fires. More information on this dataset is available at http://www3.dsi.uminho.pt/pcortez/fires.pdf.
+
+**Overview:** 
+The dataset contains 517 observations. Each row represents a fire that happened during the study from January 2000 to December 2003. The dataset also contains 13 variables, both numeric and categorical:
+
+- X-Spatial coordinate and Y-Spatial coordinate: represent the coordinate system respective to Montesinho Park.
+- FFMC: Fine Fuel Moisture Code (rain, relative humidity, temperature, and wind)
+    - this is a code measuring moisture content in litter and other fire fuels 
+- DMC: Duff Moisture Code (rain, relative humidity, and temperature)
+    - code to measure moisture in survace level organic material (high moisture = low DMC value)
+- DC: Drought Code (rain and temperature)
+    - code to measure moisture in deeper organic material (high moisture = low DC value)
+- ISI: Initial Spread Index (wind)
+    - represents the expected rate at which a fire will spread (high value = high rate of spread)
+- month, day, temp (Celsius), (Relative humidity), wind (km/h), rain (mm/m2), and area (area of burn in hectares)
+
+**Research Questions**
+- What time of year do the most forest fires happen Montesinho National Park?
+- What time of year has the largest forest fires Montesinho National Park?
+- Can a model be created to predict the amount of burned area?
+- Do more fires happen in a specific area of Montesinho National Park?
+- Do more fires happen on a certain day of the week?
+
+**Obtaining and Cleaning the Dataset**
+```{r, include=FALSE}
+library(ggplot2)
+library(tidyverse)
+library(psych)
+library(car)
+```
+
+Data is from the Machine Learning Repository and was already a very clean dataset; therefore, we didn't have any cleaning to do. 
+```{r}
+forestfires = read.csv("forestfires.csv")
+```
+We re-ordered the month and day variables, so that graphs would list these in an order that made sense to us and then added a factor variable from the area burned variable to represent different levels of area burned.
+```{r}
+forestfires$month <- factor(forestfires$month, levels = c("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"))
+forestfires$day <- factor(forestfires$day, levels = c("sun", "mon", "tue", "wed", "thu", "fri", "sat"))
+forestfires$arealevel[forestfires$area < 200.00] = "less than 200"
+forestfires$arealevel[forestfires$area >= 200.00 & forestfires$area < 400.00] = "less than 400"
+forestfires$arealevel[forestfires$area >= 400.00] = "greater than 400"
+unique(forestfires$arealevel)
+forestfires$arealevel <- factor(forestfires$arealevel, levels = c("less than 200", "less than 400", "greater than 400"))
+```
+**Exploratory Analysis**
+Looking at the histogram of area burned in hectates below, we see the data is skewed to the right, with very few observations above 200 hectares.
+```{r}
+ggplot(data = forestfires, aes(x=area)) +
+  geom_histogram(bins = 30) +
+  ggtitle("Distribution of Burned Area") +
+  xlab("Area in hectares") +
+  ylab("Count of Forest Fires")
+```
+Next we look at relationships between the weather variables (rain, temp, drought code, etc.) and the amount of area burned in a fire. We can see that there are significantly low correlations between all of the numeric variables and the area variable. These almost non-existant correlations made furthur exploration more difficult, however we still had a few ideas.
+```{r, include=FALSE}
+cormatrix1 <- cor(forestfires [,c(13,5,6,7,8)], use = "na.or.complete")
+cormatrix2 <- cor(forestfires [,c(13,9,10,11,12)], use = "na.or.complete")
+```
+```{r}
+cormatrix1
+cormatrix2
+```
+Through research we found that fireseason in this region of Portugal is defined as July, August and September. After learning this we created a subset of the data within those three months to hopefully find higher correlations between area and the weather variables. However, the distribution looked almost identical to the full dataset and the correlations between the variable area and the weather variables were very low.
+```{r}
+fireseason <- forestfires %>% filter(month %in% c('jul', 'aug', 'sep'))
+```
+```{r, include=FALSE}
+ggplot(data = fireseason, aes(x=area)) +
+  geom_histogram(bins = 30) +
+  ggtitle("Distribution of Burned Area") +
+  xlab("Area in hectares") +
+  ylab("Count of Forest Fires")
+```
+```{r, , include=FALSE}
+cormatrix5 <- cor(fireseason [,c(13,5,6,7,8)], use = "na.or.complete")
+cormatrix6 <- cor(fireseason [,c(13,9,10,11,12)], use = "na.or.complete")
+```
+```{r}
+cormatrix5
+cormatrix6
+```
+
+##Research Questions: Answered
+**What time of year do the most forest fires happen Montesinho National Park?**
+The most fires occurred in March, August and September. This makes sense based on when fire season occurs in this region.
+```{r}
+ggplot(data = forestfires, aes(x = month, fill = arealevel)) +
+  geom_bar(position = "dodge") +
+  ggtitle("Count of Fires per Month by Area") +
+  xlab("Month") +
+  ylab("Count")
+```
+
+**What time of year has the largest forest fires Montesinho National Park?**
+Looking at the graph above, we see the largest forest fires occurred in July, August and September
+
+**Can a model be created to predict the amount of burned area?**
+Looking at the correlations alone it, does not look as if a model would be able to predict the amount of area burned during a fire. We still wanted to try so we looked at the distributions of the weather variables. These two variables distributions by month seem to relate with the area variable, but even our best model including these variables fell short of significance. Temperature is the only variable in the model that is potentially significant, and the R-sq adjusted value is almost zero. This tells us that almost none of the variablity in the burn area is accounted for in the model. 
+```{r}
+ggplot(data = forestfires, aes(x = month, y = DMC)) +
+  geom_boxplot() +
+  ggtitle("Duff Moisture Code per month") +
+  xlab("Month") +
+  ylab("Duff Moisture Code")
+ggplot(data = forestfires, aes(x = month, y = temp)) +
+  geom_boxplot() +
+  ggtitle("Temperature per month") +
+  xlab("Month") +
+  ylab("Temperature")
+```
+```{r}
+model <- lm(area ~ DMC + temp, data = forestfires)
+summary(model)
+```
+
+**Do more fires happen in a specific area of Montesinho National Park?**
+These two graphs display histograms of the 10 largest forest fires in sections (3,4) and (8,6) while data was being collected. When compared, the histograms show us that the mean area burned is significantly larger in section (8,6) than section (3,4). Section (8,6) had the second most forest fires in the National Park while data was being collected. Section (3,4) contained the most forest fires in Montesinho, with 28 forest fires over the course of 4 years. The histograms show that fires did not get as extreme as it's distant neighbor, section (8,6). Reffering back to the map, we observed that there were many paths and roads on this section of the park, compared to section(3,4). We infer that this is a relatively populated area, making it easier for firefighters to detect and then intervene with these forest fires. 
+```{r, include = FALSE}
+library(dplyr)
+top = subset(forestfires, X == 3 & Y == 4)
+apl = top_n(top, 10, area)
+summary(apl$area)
+apl$areaburned[apl$area <5.00] = "Area Burned < 50000m^2"
+apl$areaburned[apl$area >= 5.00 & apl$area < 13.00] = "50000m^2 <= Area Burned <= 130000m^2"
+apl$areaburned[apl$area >= 13.00] = "Area Burned > 130000m^2"
+apl$areaburned <- factor(apl$areaburned, levels = c("Area Burned < 50000m^2", "50000m^2 <= Area Burned <= 130000m^2", "Area Burned > 130000m^2"))
+```
+```{r}
+ggplot(data = apl, aes(area, fill = areaburned, color = areaburned)) +
+  geom_histogram(position="identity") + 
+  ggtitle("Largest 10 fires in section (3,4)") +
+  xlab("Area burned") +
+  ylab("Count")
+```
+
+```{r, include=FALSE}
+top1 = subset(forestfires, X == 8 & Y == 6)
+apl1 = top_n(top1, 10, area)
+summary(apl1$area)
+
+apl1$areaburned[apl1$area < 14.00] = "Area Burned < 140000m^2"
+apl1$areaburned[apl1$area >= 14.00 & apl$area < 68.00] = "140000m^2 <= Area Burned <= 680000m^2"
+apl1$areaburned[apl1$area >= 68.00] = "Area Burned > 680000m^2"
+apl1$areaburned <- factor(apl1$areaburned, levels = c("Area Burned < 140000m^2", "140000m^2 <= Area Burned <= 680000m^2", "Area Burned > 680000m^2"))
+```
+```{r}
+ggplot(data = apl1, aes(area, fill = areaburned, color = areaburned)) +
+  geom_histogram(position="identity") + 
+  ggtitle("Largest 10 fires in section (8,6)") +
+  xlab("Area burned") +
+  ylab("Count")
+```
+
+**Do more fires happen on a certain day of the week?**
+Looking at the full dataset throughout the week more area is burned on Saturday and Sunday, than any other day. The subset of fire season indicates that more area was burned on Saturdays than any other day during July, August, and September. 
+```{r}
+ggplot(forestfires, aes(x = day, y = area)) +  
+  geom_col(fill = "sky blue") +
+  ggtitle("Area by Day (Full Dataset))")+
+  xlab("Day of the Week") +
+  ylab("Area of Burn in hectares") 
+ggplot(fireseason, aes(x = day, y = area)) +  
+  geom_col(fill = "sky blue") +
+  ggtitle("Area by Day During Fireseason")+
+  xlab("Day of the Week") +
+  ylab("Area of Burn in hectares") 
+```
+
+**Obstacles: **
+We faced many obstacles while conducting data analysis on this dataset. The dataset does not have the year each fire occured, making it impossible to determine if fireseasons differed from year to year. The significantly low correlations between area and the other variables made it difficult to build a useful model to predict area without knowledge of more complex predictive models. The codes within the data are also difficult to understand in reference to the other data, making conclusions someone difficult to express.
+
+**Conclusion:**
+While conducting our analysis we discovered one fifth of fires in the dataset occurred in Sections (3,4) and (8,6). Looking at time of year, September, August, and July tend to have the most forest fires out of the year, as well as the largest forest fires. During the fire season, more hectares of land are burned on Saturday than any other day of the week. We also found that it is fairly difficult to predict how large a forest fire will become since there are many other external variables not included in data set, such as: type of vegetation in a certain area and fire fighting intervention.
+
+
+
+#Personal Contributions
+**Carlos Gonzalez**
+
+**Jennie Huxford**
+
+**Kenneth Mendoza**
+
+**Joel Von Behren**
